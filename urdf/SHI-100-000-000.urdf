@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="SHI-100-000-000">
+  <joint name="base_weld" type="fixed">
+      <origin
+      xyz="0 0 0"
+      rpy="0 0 0" /> 
+      <parent link="world"/>
+      <child link="base_link"/>
+  </joint>      
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-1.45592495183621E-10 8.43692702174942E-06 0.00163611202324997"
+        rpy="0 0 0" />
+      <mass
+        value="2.67641567450746" />
+      <inertia
+        ixx="0.00431731052335752"
+        ixy="-1.50621558967741E-11"
+        ixz="2.51598501644799E-11"
+        iyy="0.00239134959815202"
+        iyz="-6.19850453745924E-06"
+        izz="0.0024473174073865" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/base_link.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <!-- <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/base_link.obj" />
+      </geometry>
+    </collision> -->
+  </link>
+  <link
+    name="link_1">
+    <inertial>
+      <origin
+        xyz="0.130705312993651 0.00447228927937123 -0.000809954264871137"
+        rpy="0 0 0" />
+      <mass
+        value="1.63477532447935" />
+      <inertia
+        ixx="0.0015788211208847"
+        ixy="-7.1592717257346E-05"
+        ixz="-3.10127315697788E-07"
+        iyy="0.0162949059718312"
+        iyz="-1.26179943670299E-07"
+        izz="0.0174532922140121" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_1.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <!-- <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_1.obj" />
+      </geometry>
+    </collision> -->
+  </link>
+  <joint
+    name="joint_1"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 1.5708 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.959931"
+      upper="3.1415926"
+      effort="16"
+      velocity="43" />
+  </joint>
+  <transmission type="SimpleTransmission" name="joint1">
+    <actuator name="joint1"/>
+    <joint name="joint_1"/>
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>  
+  <link
+    name="link_2">
+    <inertial>
+      <origin
+        xyz="0.100412774437422 -0.000977095560987899 0.00245046613033639"
+        rpy="0 0 0" />
+      <mass
+        value="0.778962529773284" />
+      <inertia
+        ixx="0.000544121685646857"
+        ixy="3.80627229908875E-05"
+        ixz="1.02706910194886E-08"
+        iyy="0.00664408095860777"
+        iyz="-9.61081703739117E-09"
+        izz="0.00683264775914517" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_2.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <!-- <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_2.obj" />
+      </geometry>
+    </collision> -->
+  </link>
+  <joint
+    name="joint_2"
+    type="revolute">
+    <origin
+      xyz="0.4 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="link_1" />
+    <child
+      link="link_2" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.87979"
+      upper="2.87979"
+      effort="16"
+      velocity="43" />
+  </joint>
+  <transmission type="SimpleTransmission" name="joint2">
+    <actuator name="joint2"/>
+    <joint name="joint_2"/>
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>  
+  <link
+    name="link_3">
+    <inertial>
+      <origin
+        xyz="0.00687391315700547 1.06000509000282E-16 -1.14473248550982E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.143265032698164" />
+      <inertia
+        ixx="3.6758089464326E-05"
+        ixy="-1.40146432710881E-21"
+        ixz="3.87681265368744E-21"
+        iyy="2.97205867403064E-05"
+        iyz="-5.97349903846285E-15"
+        izz="4.3940854372976E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_3.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <!-- <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_3.obj" />
+      </geometry>
+    </collision> -->
+  </link>
+  <joint
+    name="joint_3"
+    type="revolute">
+    <origin
+      xyz="0.398 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="link_2" />
+    <child
+      link="link_3" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.26893"
+      upper="2.26893"
+      effort="16"
+      velocity="43" />
+  </joint>
+  <transmission type="SimpleTransmission" name="joint3">
+    <actuator name="joint3"/>
+    <joint name="joint_3"/>
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>  
+  <link
+    name="link_4">
+    <inertial>
+      <origin
+        xyz="-1.2664E-17 -9.0587E-17 0.127057"
+        rpy="0 0 0" />
+      <mass
+        value="1.034981" />
+      <inertia
+        ixx="3.9694E-06"
+        ixy="1.1824E-08"
+        ixz="2.4288E-22"
+        iyy="3.9749E-06"
+        iyz="3.069E-22"
+        izz="6.1397E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_4.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <!-- <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/link_4.obj" />
+      </geometry>
+    </collision> -->
+  </link>
+  <joint
+    name="joint_4"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 1.5708 0" />
+    <parent
+      link="link_3" />
+    <child
+      link="link_4" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.1415926"
+      upper="3.1415926"
+      effort="16"
+      velocity="43" />
+  </joint>
+  <transmission type="SimpleTransmission" name="joint4">
+    <actuator name="joint4"/>
+    <joint name="joint_4"/>
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>  
+</robot>
