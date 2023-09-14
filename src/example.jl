@@ -7,7 +7,7 @@ old_man = build_old_manipulator();
 
 ######## RoLand manipulator
 # these work !!
-# op = OptimizationParameters([pos[1]; zeros(4)], [pos[end]; zeros(4)], 0.001, 3., diagm([10*ones(4); 0.01*ones(4)]), 1.0diagm(ones(4)), diagm([300000*ones(4);ones(4)]), 1e-8); 
+op = OptimizationParameters(x0, xf, 0.001, 1.5, diagm([10*ones(4); 0.01*ones(4)]), 15.0diagm(ones(4)), diagm([30000*ones(4);ones(4)]), 1e-8); 
 # op = OptimizationParameters([pos[1]; zeros(4)], [pos[end]; zeros(4)], 0.001, 2., diagm([10*ones(4); 0.01*ones(4)]), 1.0diagm(ones(4)), diagm([300000*ones(4);ones(4)]), 1e-8); 
 # op = OptimizationParameters([pos[1]; zeros(4)], [pos[end]; zeros(4)], 0.001, 0.5, diagm([10*ones(4); 0.01*ones(4)]), 1.0diagm(ones(4)), diagm([350000*ones(4);ones(4)]), 1e-8); 
 # the perfect trajectory
@@ -27,7 +27,6 @@ X, U = iLQR(old_man, op);
 plot_states(op.times, X) 
 plot_torques(op.times, U) 
 
- 
 
 diff = xs[end]-pos[end] .|> abs .|> rad2deg 
 

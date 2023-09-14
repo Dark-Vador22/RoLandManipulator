@@ -1,4 +1,4 @@
-# module RoLandManipulator
+module RoLandManipulator
 
 using LinearAlgebra
 using ForwardDiff
@@ -37,20 +37,18 @@ export OptimizationParameters
 
 # basic kinematic functions
 include("./kinematics.jl")
-export inverse_kinematics_analytical, inverse_kinematics_numerical, forward_kinematics!
+export inverse_kinematics!, inverse_kinematics, forward_kinematics!, forward_kinematics
 
 include("./stiffness.jl")
 
 include("./trajectory_optimization.jl")
-export dynamics
-
-# include("./trajectory_optimization_tests.jl")
+export dynamics, naive_trajectory, iLQR
 
 include("./visualization.jl")
-export plot_frame, plot_frame!, update_visualization!
+export plot_frame, plot_frame!, update_visualization!, plot_torques, plot_states, show_frequencies
 
 # creates two manipulator types from stored data
 include("./config.jl")
 export build_old_manipulator, build_new_manipulator
    
-# end # module
+end # module

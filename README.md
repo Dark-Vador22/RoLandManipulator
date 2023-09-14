@@ -1,35 +1,81 @@
-# RoLandArm.jl
+# RoLandManipulator.jl
+** This work is currently under review:**
+C. Stoeffler, J. Janzen, A. del Rio and H. Peters, Design Analysis of a Novel Belt-Driven Manipulator for Fast Movements, IEEE International Conferenceon Robotics and Automation, 2024, Submitted September 2023
 
 * Be aware that the kinematic functions are written for $`\mathbf{\theta} \in \mathbb{R}^5`$, whereas the trajectory optimization works for $`\mathbf{\theta} \in \mathbb{R}^4`$
 
 ## Installing julia and installing package
 
 * Visit https://julialang.org and download the appropriate version
-* Use of `const` inside `mutable struct` requires julia version 1.8 here!
+* Use of `const` inside `mutable struct` requires at least julia version 1.8 here!
 * A symlink can be created in `.bashrc` with `export PATH="$PATH:/path/to/<Julia directory>/bin"`
 * Download the repo
-* Start julia and open the package manager with `]` and run `dev --local RELATIVE_PATH_TO/RoLandArm`
+* Start julia and open the package manager with `]` and run `dev --local RELATIVE_PATH_TO/RoLandManipulator`
 
 ## Using the package
-The package can now be loaded in a Julia session and an object of type `Manipulator` can be created
+The package can now be loaded in a Julia session and a variable of type `Manipulator` can be created by calling a function from a config file.
 ```jl
 julia> using RoLandManipulator
 
-julia> # MORE DOC HERE!
+julia> manipulator = build_old_manipulator()
 ```
 
-Depiction of the manipulator in its initial configuration can be done
+This creates a MeshCat server for the visualization of the manipulator in its initial configuration
 ```jl
+[ Info: Listening on: 127.0.0.1:8704, thread id: 1
+┌ Info: MeshCat server started. You can open the visualizer by visiting the following URL in your browser:
+└ http://127.0.0.1:8700
+
 julia> # MORE DOC HERE!
 ```
-
-Forward and inverse kinematics can be computed, where the elbow joint possesses two inverse solutions. Note that the function `forward_kinematics!` alters the Manipulator object and returns the end-effector frame, whereas `inverse_kinematics_analytical` simply returns the joint angles given from a end-effector pose.
+### Simple kinematics
+Forward and inverse kinematics can be computed, where the elbow joint possesses two inverse solutions. Note that the functions `forward_kinematics!` and `inverse_kinematics!` alter the variable of type `Manipulator`:
 ```jl
 θ = 1 .- 2rand(5,)
-C = forward_kinematics!(man, θ)
-show_manipulator(man)
-θn = inverse_kinematics_analytical(man, C, sol = 2)
+C = forward_kinematics!(manipulator, θ)
+update_visualization!(manipulator)
+θn = inverse_kinematics(man, C, sol = 2)
 ```
+
+### Trajectory creation
+Trajectories can be created with the functions below. For this purpose, another variable containing all hyperparameters is created
+```jl
+# initial and final configuration
+x0 = [0.17; -1.22; -0.7; 0; zeros(4)]
+xf = [3.12; 1.22; 1.57; 0; zeros(4)]
+
+# hyperparameters for optimization
+op = OptimizationParameters(x0, xf, 0.001, 1.5, diagm([10*ones(4); 0.01*ones(4)]), 15.0diagm(ones(4)), diagm([30000*ones(4);ones(4)]), 1e-8);
+
+X, U = iLQR(manipulator, op);
+
+plot_states(op.times, X) 
+plot_torques(op.times, U)
+
+# animating the trajectory (may take some time in the first run)
+xs = [X[i][1:4] for i=1:op.N]; 
+animation = MeshCat.Animation(old_man.mvis, op.times, xs);
+setanimation!(old_man.mvis, animation);
+```
+
+Alternatively, a simple trajectory can be created as well
+```jl
+X, U = naive_trajectory(manipulator, op);
+
+plot_states(op.times, X) 
+plot_torques(op.times, U)
+
+xs = [X[i][1:4] for i=1:op.N]; 
+animation = MeshCat.Animation(old_man.mvis, op.times, xs);
+setanimation!(old_man.mvis, animation);
+```
+
+### Eigenmodes
+A plot of the frequency modes for 500 random poses can be created
+```jl
+julia> plt = show_frequencies(manipulator, 500)
+```
+
 ## Joint space kinematics
 ![test](./images/arm_ik.png?raw=true "Zero pose and multiple solutions")
 ![test](./images/relative_transforms.png?raw=true "Relative rigid-body transforms")
@@ -38,91 +84,49 @@ show_manipulator(man)
 
 ![test](./images/belt_drives.png?raw=true "Belt routing in robot arm")
 
-Due to belts and bevel gear, there is a linear transform between joint coordinates and motor coordinates, involving the gear ratios - see also `src/manipulator_kinematics.jl -> motor2joint()` The underlying schematics looks as follows:
-![test](./images/arm_schematics.png?raw=true "Schematics of the arm for the last 4 DOFs in planar depiction")
+Due to belts and bevel gear, there is a linear transform between joint coordinates and motor coordinates, involving the gear ratios. The underlying schematics looks as follows:
+![test](./images/arm_schematics_old.png?raw=true "Schematics of the arm for the last 4 DOFs in planar depiction")
 
 From this, one can obtain the connected graph that represents the system of linear equations
 
-![test](./images/graph.png?raw=true "Unerlying graph of the manipulator")
+![test](./images/graph_old.png?raw=true "Unerlying graph of the manipulator")
 
-The transfer between motor and joint coordinates can be represented in the structure matrix $\mathbf{A}$
+The transfer between motor and joint coordinates can be represented in the structure matrix $\mathbf{S}^T$
 ```math
-\mathbf{\theta} = \mathbf{A}\mathbf{\mu}
+\mathbf{\mu} = \mathbf{S}\mathbf{\theta}
 ```
-where $`\mathbf{\theta}`$ denotes joint coordinates and $`\mathbf{\mu}`$ motor coordinates. However, the first joint $`\theta_1`$ relates to the prismatic joint and no coupling to other motors occurs. The matrix $`\mathbf{A}`$ is obtained from the set of circuit- and coaxial-equations and writes
+where $`\mathbf{\theta}`$ denotes joint coordinates and $`\mathbf{\mu}`$ motor coordinates. The matrix $`\mathbf{S}`$ is obtained from the set of circuit- and coaxial-equations and writes
 ```math
-\mathbf{A} = 
-\begin{bmatrix}
-g_1 & 0 & 0 & 0 & 0 \\
-0 & g_2 & 0 & 0 & 0 \\
-0 & -g_2g_3 & g_3 & 0 & 0 \\
-0 & 0.5(g_4 + g_7) & -0.5(g_5 + g_8) & 0.5g_6 & 0.5g_9 \\
-0 & 0.5(g_4 - g_7) & -0.5(g_5 - g_8) & 0.5g_6 & -0.5g_9 \\
-\end{bmatrix}
+\mathbf{S}^T = 
+        \begin{matrix}
+                1/g_1 & 1 & 1 & 1 \\
+                0 & 1/g_2 & 1/g_3 & 1/g_4 \\
+                0 & 0 & 1/g_5 & 1/g_6 \\
+                0 & 0 & 1/g_5 & -1/g_6
+        \end{matrix}
 ```
 with the following gear ratios $`g_i`$ related to schemactics and graph:
 ```math
-\begin{matrix}
-g_2 = & N_1^5N_5^6 \\
-g_3 = & N_2^7N_7^8 \\
-g_4 = & (N_5^6N_1^5N_7^8N_2^7 - N_5^6N_1^5N_3^9)N_9^{11} \\
-g_5 = & N_7^8N_2^7N_9^{11} \\
-g_6 = & N_3^9N_9^{11} \\
-g_7 = & (N_5^6N_1^5N_7^8N_2^7 - N_5^6N_1^5N_4^{10})N_{10}^{12} \\
-g_8 = & N_7^8N_2^7N_{10}^{12} \\
-g_9 = & N_4^{10}N_{10}^{12}
-\end{matrix}
+\mathbf{g} = \begin{matrix}
+                g_1 \\
+                g_2 \\
+                g_3 \\
+                g_4 \\
+                g_5 \\
+                g_6 \\
+        \end{matrix} = 
+        \begin{matrix}
+                N_1^5N_5^6 \\
+                N_2^7N_7^8 \\
+                N_3^9 \\
+                N_4^{10} \\
+                N_3^9N_9^{11} \\
+                N_4^{10}N_{10}^{12}
+        \end{matrix}
 ```
-where the gear ratio computes from the wheel belt radi s.t. $N_j^i = r_j/r_i$ and $1/N_j^i = N_i^j$. One can see, that if the transmissions in the entire power line of the bevel gear are equal, such that $N_3^9 = N_4^{10}$ and $N_9^{11} = N_{10}^{12}$, it turns out that $g_4 = g_7$, $g_5 = g_8$ and $g_6 = g_9$. The structure matrix then reduces to
-```math
-\mathbf{A} = 
-\begin{bmatrix}
-g_1 & 0 & 0 & 0 & 0 \\
-0 & g_2 & 0 & 0 & 0 \\
-0 & -g_2g_3 & g_3 & 0 & 0 \\
-0 & g_4 & -g_5  & 0.5g_6 & 0.5g_6 \\
-0 & 0 & 0 & 0.5g_6 & -0.5g_6 \\
-\end{bmatrix}
-```
-
-Looking at the time derivative of $\mathbf{\theta}$, one gets
-```math
-\dot{\mathbf{\theta}} = \mathbf{A}\dot{\mathbf{\mu}} + \underbrace{\dot{\mathbf{A}}\mathbf{\mu}}_{=0}
-```
-The power from virtual torque $`\mathbf{\tau}_v`$ in joint space must be equal to the power in the motors:
-```math
-\mathbf{\tau}_v^T\dot{\mathbf{\theta}} = \mathbf{\tau}^T\dot{\mathbf{\mu}}
-```
-```math
-\mathbf{\tau}_v^T\mathbf{A}\dot{\mathbf{\mu}} = \mathbf{\tau}^T\dot{\mathbf{\mu}}
-```
-what can only hold true (no zeros in $`\dot{\mathbf{\mu}}`$ assumed) if
-```math
-\mathbf{\tau} = \mathbf{A}^T\mathbf{\tau}_v
-```
-and shows that between motors and joints, there is a linear constant map, given by the motor gear ratios and belt transmissions. The available torque on joint level then writes
-```math
-\mathbf{\tau}_v = \mathbf{A}^{-T}\mathbf{\tau}
-```
-And in detail
-```math
-\mathbf{\tau}_v = 
-\begin{bmatrix}
-1/g_1 & 0 & 0 & 0 & 0 \\
-0 & 1/g_2 & 1 & (g_2g_5 - g_4)/(g_2g_6) & (g_2g_5 - g_4)/(g_2g_6) \\
-0 & 0 & 1/g_3 & g_5/(g_3g_6) & g_5/(g_3g_6) \\
-0 & 0 & 0 & 1/g_6 & 1/g_6 \\
-0 & 0 & 0 & 1/g_6 & -1/g_6 \\
-\end{bmatrix}
-\mathbf{\tau}
-```
-what shows that the first revolute joint in the base $`\theta_2`$ obtains the summed torque of all subsequent motors.
+where the gear ratio computes from the wheel belt radi s.t. $N_j^i = r_j/r_i$ and $1/N_j^i = N_i^j$. 
 
 ## Belt kinematics of the new design
-
-![test](./images/belt_drives.png?raw=true "Belt routing in robot arm")
-
-Due to belts and bevel gear, there is a linear transform between joint coordinates and motor coordinates, involving the gear ratios - see also `src/manipulator_kinematics.jl -> motor2joint()` The underlying schematics looks as follows:
 
 ![test](./images/arm_schematics_new.png?raw=true "Schematics of the arm for the last 4 DOFs in planar depiction")
 
@@ -130,52 +134,3 @@ From this, one can obtain the connected graph that represents the system of line
 
 ![test](./images/graph_new.png?raw=true "Unerlying graph of the manipulator")
 
-For the new system, the structure matrix $\mathbf{A}$ writes
-```math
-\mathbf{A} = 
-\begin{bmatrix}
-g_1 & 0 & 0 & 0 & 0 \\
-0 & g_2 & 0 & 0 & 0 \\
-0 & -g_2N_{15}^8 & g_3N_{15}^8 & 0 & 0 \\
-0 & 0.5(g_4 + g_7) & -0.5(g_5 + g_8) & 0.5g_6 & 0.5g_9 \\
-0 & 0.5(g_4 - g_7) & -0.5(g_5 - g_8) & 0.5g_6 & -0.5g_9 \\
-\end{bmatrix}
-```
-where $N_{15}^8 = 1$ was picked to have a parallel moving second link. The remaining gear ratios then write
-```math
-\begin{matrix}
-g_2 = & N_1^5N_5^6 \\
-g_3 = & N_2^7N_7^{15} \\
-g_4 = & (N_5^6N_1^5N_{15}^8 - N_5^6N_1^5N_3^9)N_9^{11} \\
-g_5 = & N_2^7N_7^{15}N_{15}^8N_9^{11} \\
-g_6 = & N_3^9N_9^{11} \\
-g_7 = & (N_5^6N_1^5N_{15}^8 - N_5^6N_1^5N_4^{10})N_{10}^{12} \\
-g_8 = & N_2^7N_7^{15}N_{15}^8N_{10}^{12} \\
-g_9 = & N_4^{10}N_{10}^{12}
-\end{matrix}
-```
-Again, by symmetric considrations, such as $N_3^9 = N_4^{10}$ and $N_9^{11} = N_{10}^{12}$, it turns out that $g_4 = g_7$, $g_5 = g_8$ and $g_6 = g_9$. The structure matrix again reduces to
-```math
-\mathbf{A} = 
-\begin{bmatrix}
-g_1 & 0 & 0 & 0 & 0 \\
-0 & g_2 & 0 & 0 & 0 \\
-0 & -g_2 & g_3 & 0 & 0 \\
-0 & g_4 & -g_5  & 0.5g_6 & 0.5g_6 \\
-0 & 0 & 0 & 0.5g_6 & -0.5g_6 \\
-\end{bmatrix}
-```
-
-The torque mapping between motor and joint space then writes
-```math
-\mathbf{\tau}_v = 
-\begin{bmatrix}
-1/g_1 & 0 & 0 & 0 & 0 \\
-0 & 1/g_2 & 1/g_3 & (g_2g_5 - g_3g_4)/(g_2g_3g_6) & (g_2g_5 - g_3g_4)/(g_2g_3g_6) \\
-0 & 0 & 1/g_3 & g_5/(g_3g_6) & g_5/(g_3g_6) \\
-0 & 0 & 0 & 1/g_6 & 1/g_6 \\
-0 & 0 & 0 & 1/g_6 & -1/g_6 \\
-\end{bmatrix}
-\mathbf{\tau}
-```
-what shows that the first revolute joint in the base $`\theta_2`$ obtains the summed torque of all subsequent motors.
