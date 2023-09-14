@@ -8,22 +8,22 @@ end
 """
 Shows torques from collected control array 
 """
-function plot_torques(times::AbstractVector, τ::AbstractVector)
+function plot_torques(times::AbstractVector, τ::AbstractVector; cscheme=:Dark2_5, joints=[1,2,3,4])
     plt = plot(xlabel = "time [s]", ylabel = "torque [Nm]")
-    for i = 1:length(τ[1])
-        plot!(plt, times[1:end-1], [τ[j][i] for j = 1:length(τ)], lw = 2, ls = :dash, alpha = 0.5, label = "joint $i")
+    for i in joints
+        plot!(plt, times[1:end-1], [τ[j][i] for j = 1:length(τ)], lw = 3, ls = :dash, alpha = 0.6, label = "joint $i", color=palette(cscheme)[i], size=(800,300),
+        bottom_margin=5mm, left_margin=5mm,xtickfontsize=10,ytickfontsize=10,dpi=500)
     end
     return plt
-end
+end 
 
-function plot_torques(times::AbstractVector, τ::AbstractVector, ζ::AbstractVector)
-    plt = plot_torques(times, τ)
-    for i = 1:length(ζ[1])
-        plot!(plt, times[1:end-1], [ζ[j][i] for j = 1:length(ζ)], lw = 2, label = "actuator $i")
+function plot_torques(times::AbstractVector, τ::AbstractVector, ζ::AbstractVector; cscheme=:Dark2_5, joints=[1,2,3,4])
+    plt = plot_torques(times, τ, cscheme=cscheme, joints=joints)
+    for i in joints
+        plot!(plt, times[1:end-1], [ζ[j][i] for j = 1:length(ζ)], lw = 3, label = "actuator $i", color=palette(cscheme)[i+4])
     end
     return plt
-end
-        
+end        
 
 """
 Shows position and velocity of collected state vector

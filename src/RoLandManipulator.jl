@@ -6,6 +6,7 @@ using StaticArrays
 using Plots
 using JLD2, FileIO
 using ImageIO
+using Measures 
 
 using MeshCat
 using MeshCatMechanisms
