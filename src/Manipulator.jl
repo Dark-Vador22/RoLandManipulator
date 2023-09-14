@@ -45,7 +45,7 @@ mutable struct Manipulator
         # checking input
         DOF = length(joint_axis)
         @assert length(Cl) == DOF + 1 "Number of relative transforms and joints inconsistent"
-        @assert size(S) == (DOF, DOF) "Wrong dimension of structure matrix - has to be $DOF×$DOF"
+        @assert size(S) == (DOF-1, DOF-1) "Wrong dimension of structure matrix - has to be $(DOF-1)×$(DOF-1)"
         DOF == 5 ? nothing : @warn "Different DOFs than expected - kinematic functions do not work!"
 
         rbd_model = parse_urdf(urdf)

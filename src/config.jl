@@ -50,17 +50,16 @@ function build_old_manipulator()
     n12 = 20
     
     # building structure matrix
-    g1 = 0.1 # fixed value for spindle gear
-    g2 = (n1/n5i)*(n5o/n6)
-    g3 = (n2/n7i)*(n7o/n8)
-    g4 = (g2*g3 - g2*(n3/n9i))*(n9o/n11)
-    g5 = g3*(n9o/n11)
-    g6 = (n3/n9i)*(n9o/n11)
-    g7 = (g2*g3 - g2*(n4/n10i))*(n10o/n12)
-    g8 = g3*(n10o/n12)
-    g9 = (n4/n10i)*(n10o/n12)
+    g1 = (n1/n5i)*(n5o/n6)
+    g2 = (n2/n7i)*(n7o/n8)
+    g3 = (g1*g2 - g1*(n3/n9i))*(n9o/n11)
+    g4 = g2*(n9o/n11)
+    g5 = (n3/n9i)*(n9o/n11)
+    g6 = (g1*g2 - g1*(n4/n10i))*(n10o/n12)
+    g7 = g2*(n10o/n12)
+    g8 = (n4/n10i)*(n10o/n12)
     
-    S = [[g1, 0, 0, 0, 0] [0, g2, -g2*g3, 0.5*(g4 + g7), 0.5*(g4 - g7)] [0, 0, g3, -0.5*(g5 + g8), -0.5*(g5 - g8)] [0, 0, 0, 0.5g6, 0.5g6] [0, 0, 0, 0.5g9, -0.5g9]]
+    S = inv([[g1, -g1*g2, 0.5*(g3 + g6), 0.5*(g3 - g6)] [0, g2, -0.5*(g4 + g7), -0.5*(g4 - g7)] [0, 0, 0.5g5, 0.5g5] [0, 0, 0.5g8, -0.5g8]])
     
     # building actuation space stiffness matrix for planar 4 DOFs
     # length specific stiffness of 10mm and 16mm belt
@@ -121,17 +120,16 @@ function build_new_manipulator()
     n15o = 34
     
     # building structure matrix
-    g1 = 0.1 # fixed value for spindle gear
-    g2 = (n1/n5i)*(n5o/n6)
-    g3 = (n2/n7i)*(n7o/n15i)
-    g4 = (g2*(n15o/n8) - g2*(n3/n9i))*(n9o/n11)
-    g5 = g3*(n15o/n8)*(n9o/n11)
-    g6 = (n3/n9i)*(n9o/n11)
-    g7 = (g2*(n15o/n8) - g2*(n4/n10i))*(n10o/n12)
-    g8 = g3*(n15o/n8)*(n10o/n12)
-    g9 = (n4/n10i)*(n10o/n12)
+    g1 = (n1/n5i)*(n5o/n6)
+    g2 = (n2/n7i)*(n7o/n15i)
+    g3 = (g1*(n15o/n8) - g1*(n3/n9i))*(n9o/n11)
+    g4 = g2*(n15o/n8)*(n9o/n11)
+    g5 = (n3/n9i)*(n9o/n11)
+    g6 = (g1*(n15o/n8) - g1*(n4/n10i))*(n10o/n12)
+    g7 = g2*(n15o/n8)*(n10o/n12)
+    g8 = (n4/n10i)*(n10o/n12)
     
-    S = [[g1, 0, 0, 0, 0] [0, g2, -g2*(n15o/n8), 0.5*(g4 + g7), 0.5*(g4 - g7)] [0, 0, g3*(n15o/n8), -0.5*(g5 + g8), -0.5*(g5 - g8)] [0, 0, 0, 0.5g6, 0.5g6] [0, 0, 0, 0.5g9, -0.5g9]]
+    S = inv([[g1, -g1*(n15o/n8), 0.5*(g3 + g6), 0.5*(g3 - g6)] [0, g2*(n15o/n8), -0.5*(g4 + g7), -0.5*(g4 - g7)] [0, 0, 0.5g5, 0.5g5] [0, 0, 0.5g8, -0.5g8]])
 
     # building actuation space stiffness matrix for planar 4 DOFs
     # length specific stiffness of 10mm and 16mm belt

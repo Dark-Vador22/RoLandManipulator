@@ -1,18 +1,4 @@
 """
-Uses the discrete dynamics (under RK4 with zero-order hold) to obtain the linear transforms 'A' and 'B'
-Here, everything happens in joint-space
-    x:          state variables that contain position and velocity
-    u:          controls that contain the joint torques
-"""
-function linearize_model!(man::Manipulator, x::AbstractVector, u::Union{AbstractVector, Real}, h::Float64; aspo=false)
-    discrete_dynamics(x, u) = rk4((x, u) -> dynamics(man, aspo, x, u), x, u, h)
-
-    ForwardDiff.jacobian!(man.A, x_ -> discrete_dynamics(x_, u), x)
-    ForwardDiff.jacobian!(man.B, u_ -> discrete_dynamics(x, u_), u)
-
-end
-
-"""
 Creates a naive control trajectory in three steps:
     1. Linearly interpolating joint space coordinates for configurations between x0 and xf
     2. Assuming a given maximal acceleration until half distance, followed by maximal deceleration 
@@ -71,6 +57,20 @@ function naive_trajectory(man::Manipulator, op::OptimizationParameters; sim_forw
     end
  
     return X, τ
+end
+
+"""
+Uses the discrete dynamics (under RK4 with zero-order hold) to obtain the linear transforms 'A' and 'B'
+Here, everything happens in joint-space
+    x:          state variables that contain position and velocity
+    u:          controls that contain the joint torques
+"""
+function linearize_model!(man::Manipulator, x::AbstractVector, u::Union{AbstractVector, Real}, h::Float64; aspo=false)
+    discrete_dynamics(x, u) = rk4((x, u) -> dynamics(man, aspo, x, u), x, u, h)
+
+    ForwardDiff.jacobian!(man.A, x_ -> discrete_dynamics(x_, u), x)
+    ForwardDiff.jacobian!(man.B, u_ -> discrete_dynamics(x, u_), u)
+
 end
 
 """
