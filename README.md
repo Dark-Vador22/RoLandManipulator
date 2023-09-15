@@ -1,5 +1,5 @@
 # RoLandManipulator.jl
-** This work is currently under review:**
+**This work is currently under review:**
 C. Stoeffler, J. Janzen, A. del Rio and H. Peters, Design Analysis of a Novel Belt-Driven Manipulator for Fast Movements, IEEE International Conferenceon Robotics and Automation, 2024, Submitted September 2023
 
 * Be aware that the kinematic functions are written for $`\mathbf{\theta} \in \mathbb{R}^5`$, whereas the trajectory optimization works for $`\mathbf{\theta} \in \mathbb{R}^4`$
