@@ -7,7 +7,7 @@ for link in get_elements_by_tagname(xroot, "link")
     mesh = get_elements_by_tagname(get_elements_by_tagname(get_elements_by_tagname(link, "visual")[1], "geometry")[1], "mesh")[1]
     value = attribute(mesh, "filename")[2:end]
     ### NEVER USE JOINPATH HERE!!!!
-    new_value = abspath(pathof(RoLandManipulator)*"/../../"*value)
+    new_value = abspath(String(@__DIR__)*"/../"*value)
     set_attribute(mesh, "filename", new_value)
 end
 # save file as copy in package
@@ -68,14 +68,12 @@ function build_old_manipulator()
     # building structure matrix
     g1 = (n1/n5i)*(n5o/n6)
     g2 = (n2/n7i)*(n7o/n8)
-    g3 = (g1*g2 - g1*(n3/n9i))*(n9o/n11)
-    g4 = g2*(n9o/n11)
+    g3 = n3/n9i
+    g4 = n4/n10i
     g5 = (n3/n9i)*(n9o/n11)
-    g6 = (g1*g2 - g1*(n4/n10i))*(n10o/n12)
-    g7 = g2*(n10o/n12)
-    g8 = (n4/n10i)*(n10o/n12)
+    g6 = (n4/n10i)*(n10o/n12)
     
-    S = inv([[g1, -g1*g2, 0.5*(g3 + g6), 0.5*(g3 - g6)] [0, g2, -0.5*(g4 + g7), -0.5*(g4 - g7)] [0, 0, 0.5g5, 0.5g5] [0, 0, 0.5g8, -0.5g8]])
+    S = [[1/g1, 1, 1, 1] [0, 1/g2, 1/g3, 1/g4] [0, 0, 1/g5, 1/g6] [0, 0, 1/g5, -1/g6]]
     
     # building actuation space stiffness matrix for planar 4 DOFs
     # length specific stiffness of 10mm and 16mm belt
