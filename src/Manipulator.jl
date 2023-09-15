@@ -17,8 +17,8 @@ mutable struct Manipulator
     θ::Vector{<:Real}               # joint space vector    
     
     # actuation space quantities
-    const S::Matrix{<:Real}         # transpose of structure matrix: relates actuation and joint space
-    const S_::Matrix{<:Real}        # inverse of S
+    const S::AbstractMatrix         # transpose of structure matrix: relates actuation and joint space
+    const S_::AbstractMatrix        # inverse of S
     const τ_limit::Float64          # actuator torque limits
     const K_μ::Matrix{<:Real}       # actuation space stiffness matrix
     μ::Vector{<:Real}               # actuation space vector
@@ -40,7 +40,7 @@ mutable struct Manipulator
     """
     Standard constructor - geometry of manipulator is defined inside
     """
-    function Manipulator(C0::SE3, Cl::Vector{SE3}, joint_axis::Vector{se3}, S::Matrix{<:Real}, τ_limit::Float64, K_μ::Matrix{<:Real}, urdf::String = "default"; n::Int = 8, m::Int = 4, friction::Float64 = 0.)
+    function Manipulator(C0::SE3, Cl::Vector{SE3}, joint_axis::Vector{se3}, S::AbstractMatrix, τ_limit::Float64, K_μ::Matrix{<:Real}, urdf::String = "default"; n::Int = 8, m::Int = 4, friction::Float64 = 0.)
         
         # checking input
         DOF = length(joint_axis)
