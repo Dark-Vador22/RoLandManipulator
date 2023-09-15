@@ -14,7 +14,7 @@ function naive_trajectory(man::Manipulator, op::OptimizationParameters; sim_forw
     # interpolation of joint coordinates 
     Δθ = op.xf[1:man.m] - op.x0[1:man.m]
 
-    # assuming bang-bang acceleration vector
+    # assuming "bang-bang" acceleration vector
     a = 4Δθ/op.tf^2
 
     # fake_state is used to get the acceleration vector as SegmentedVector, which is not sufficiently documented to be created alone
@@ -90,7 +90,7 @@ function trajectory_cost(X, U, op::OptimizationParameters)
     return J
 end
 
-function backward_pass(X, U, man::Manipulator, op::OptimizationParameters, it::Int ; fpf = false)
+function backward_pass(X, U, man::Manipulator, op::OptimizationParameters; fpf = false, verbose=false)
     # preallocating feedback gains and feed-forward terms
     K = Vector{Matrix{Float64}}(fill(zeros(op.m, op.n), op.N-1))
     d = Vector{Vector{Float64}}(fill(zeros(op.m), op.N-1))
@@ -138,14 +138,16 @@ function backward_pass(X, U, man::Manipulator, op::OptimizationParameters, it::I
 
             Quu += man.B'*op.β*I*man.B 
             if c > op.r_max
-                @warn "Regularization failed at k = $k"
+                if verbose
+                    @warn "Regularization failed at k = $k"
+                end 
                 break
             end
             c += 1
         end
         # op.β > op.β_max && (op.β = op.β_max)
         
-        # if partial hessian is rank deficient, reinitialize backward pass with increased 
+        # if partial hessian is rank deficient, reinitialize backward pass with increased regularization
         if !isinvertible(Quu)
             return K, d, ΔVu, ΔVuu, true
         end
@@ -165,7 +167,7 @@ function backward_pass(X, U, man::Manipulator, op::OptimizationParameters, it::I
     return K, d, ΔVu, ΔVuu, false 
 end
 
-function forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man::Manipulator, op::OptimizationParameters; bpf = false)
+function forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man::Manipulator, op::OptimizationParameters; bpf = false, verbose=false)
     # skip execution and directly jump to backward pass if previous backward pass was stopped due to rank deficiency
     if bpf 
         return X, U, J, true
@@ -197,7 +199,9 @@ function forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man::Manipulator, op::Optimiza
         if op.lb < z < op.ub
             break
         elseif count > op.l_max
-            @warn "Line search does not converge!"
+            if verbose
+                @warn "Line search does not converge!"
+            end 
             fpf = true 
             break
         end
@@ -207,7 +211,7 @@ function forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man::Manipulator, op::Optimiza
     return Xn, Un, Jn, fpf
 end 
 
-function iLQR(man::Manipulator, op::OptimizationParameters, inverse_dyn::Bool = false)
+function iLQR(man::Manipulator, op::OptimizationParameters, inverse_dyn::Bool = false; verbose = false)
     # checking first the conformity of Manipulator and OptimizationParameters
     if op.n != man.n
         throw(error("State dimensions do not match cost matrix dimensions. x ∈ ℝ^{$(op.n) × 1} but Q ∈ ℝ^{$(man.n) × $(man.n)} "))
@@ -228,21 +232,21 @@ function iLQR(man::Manipulator, op::OptimizationParameters, inverse_dyn::Bool = 
             X[k+1] = rk4((x, u) -> dynamics(man, op.aspo, x, u), X[k], U[k], op.times[k+1] - op.times[k])
         end
     end
-    
-    return iLQR(X, U, man, op)
+
+    return iLQR(X, U, man, op, verbose=verbose)
 end
 
-function iLQR(X::AbstractArray, U::AbstractArray, man::Manipulator, op::OptimizationParameters)
+function iLQR(X::AbstractArray, U::AbstractArray, man::Manipulator, op::OptimizationParameters; verbose = false)
     # getting feedbak and feed-forward terms from initial trajectory
-    K, d, ΔVu, ΔVuu = backward_pass(X, U, man, op, 1)
+    K, d, ΔVu, ΔVuu = backward_pass(X, U, man, op)
     J = trajectory_cost(X, U, op)
     c = 1
     bpf = false
     while maximum(abs.(collect(Iterators.flatten(d)))) > op.tol
-        X, U, J, fpf = forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man, op, bpf=bpf)
-        K, d, ΔVu, ΔVuu, bpf = backward_pass(X, U, man, op, c, fpf=fpf);
+        X, U, J, fpf = forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man, op, bpf=bpf,verbose=verbose)
+        K, d, ΔVu, ΔVuu, bpf = backward_pass(X, U, man, op, fpf=fpf,verbose=verbose);
         c += 1
-        println(c)
+        println("interation: $c")
         if c >= op.i_max
             break
         end
@@ -268,8 +272,8 @@ end
 Accurate friction model considering coulomb and viscous friction 
 """
 function friction_model(q̇)
-    fs = 1.0        # static coulomb (should be higher than viscous) 0.6
-    fv = 0.8        # viscous friction 0.2
+    fs = 1.0        # static coulomb  
+    fv = 0.5        # viscous friction 
     τ_f = fs*sign.(q̇) + fv*q̇
     return τ_f
 end   
@@ -295,7 +299,7 @@ function dynamics(man::Manipulator, aspo::Bool, x::AbstractVector{T1}, u::Abstra
         end 
     end
 
-    # alternative friction model, only partly velocity dependent 
+    # friction model only partly velocity dependent 
     friction = friction_model.(parent(velocity(state)))
     
     dynamics!(res, state, u_ - friction)
