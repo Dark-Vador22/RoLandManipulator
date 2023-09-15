@@ -3,18 +3,22 @@ module RoLandManipulator
 using LinearAlgebra
 using ForwardDiff
 using StaticArrays
-using Plots
+
+# data stuff
+using LightXML
 using JLD2, FileIO
 using ImageIO
 using Measures 
+using CSV
+using DataFrames
 
+# visualization
+using Plots
 using MeshCat
 using MeshCatMechanisms
 using RigidBodyDynamics
 
-using CSV
-using DataFrames
-
+# we are going to overload these ones
 import Base: +, -, *, /
 import LinearAlgebra: det, inv
 

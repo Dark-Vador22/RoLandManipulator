@@ -1,3 +1,19 @@
+# altering the relative paths in URDF-file, once this package is loaded
+filename = abspath(joinpath(@__DIR__, "..", "urdf/SHI-100-000-000_ccd.urdf"))
+xdoc = parse_file(filename)
+xroot = LightXML.root(xdoc)
+# changing attributes only of the visual - there is also collision!
+for link in get_elements_by_tagname(xroot, "link")
+    mesh = get_elements_by_tagname(get_elements_by_tagname(get_elements_by_tagname(link, "visual")[1], "geometry")[1], "mesh")[1]
+    value = attribute(mesh, "filename")[2:end]
+    ### NEVER USE JOINPATH HERE!!!!
+    new_value = abspath(pathof(RoLandManipulator)*"/../../"*value)
+    set_attribute(mesh, "filename", new_value)
+end
+# save file as copy in package
+save_file(xdoc, joinpath(@__DIR__, "..", "urdf/local_copy.urdf"))
+
+
 """
 Definition of joints and links by Lie group representation
 """
@@ -87,7 +103,7 @@ function build_old_manipulator()
 
     K_μ = diagm([actuation_space_stiffness(rs[i], kss[i], ρs[i]) for i = 1:4])
 
-    return Manipulator(C0, Cl, joint_axis, S, 6., K_μ, abspath(joinpath(@__DIR__, "..", "urdf/SHI-100-000-000_ccd.urdf")), friction = 0.1)
+    return Manipulator(C0, Cl, joint_axis, S, 6., K_μ, abspath(joinpath(@__DIR__, "..", "urdf/local_copy.urdf")), friction = 0.1)
 end
 
 
