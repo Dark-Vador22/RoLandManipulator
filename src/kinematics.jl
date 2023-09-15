@@ -157,29 +157,3 @@ Gives the manipulator Jacobian w.r.t. the end-effector fixed frame
 function body_jacobian(man::Manipulator)
     return Matrix{Real}(Ad(inv(man.config[end]))*space_jacobian(man))
 end
-
-"""
-Returning NaN when out of bounds for input of acos
-==========
-    x:       input for function [ ]
-"""
-function uacos(x::Number)
-    if abs(x) > 1.0
-        return NaN
-    else
-        return acos(x)
-    end
-end
-
-"""
-Returns proper location of index in array
-"""
-function whereis(ar::AbstractArray, a::Any)
-    sol = Vector{Int}(undef, 0)
-    for (i, val) in enumerate(ar)
-        if val == a
-            push!(sol, i)
-        end
-    end
-    return sol
-end

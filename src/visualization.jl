@@ -134,6 +134,42 @@ function frame_overlay(path, n_files; flipdir=false, alpha_start=0, alpha_end=1)
     return plt
 end 
 
+"""
+Scattering function that depicts the frequency modes of the arm in random poses
+"""
+function show_frequencies(man::Manipulator, n::Int=1000; size = (900, 600))
+    state = MechanismState(man.rbd_model, zeros(man.m), zeros(man.m))
+    
+    pal = palette(:Dark2_5)
+
+    plt = plot(legend = (0.2, 0.6), legendcolumns = 4, xlabel = "f [Hz]", ylabel = "involvement", tickfontsize = 12, guidefontsize = 12, left_margin = 5*Plots.mm, legendfontsize = 10, dpi = 250, size = size)
+
+    for i = 1:n
+        rnd = π*(2rand(man.m) .- 1)
+        set_configuration!(state, rnd)
+        M = mass_matrix(state)
+        a, v = eigen(man.K_θ, Matrix(M), sortby = nothing)
+        f = sqrt.(a)/2π
+
+        # normalizing every egeinvetor to 1
+        for j = 1:man.m
+            v[:,j] .= abs.(v[:,j]/norm(v[:,j]))
+        end
+
+        for j = 1:man.m
+            if i == n
+                scatter!(plt, f, v[j,:], c = pal[j], alpha = 1, label = "joint $j", ms = 3, msw = 0.)
+                ci = argmax(abs.(v))
+                scatter!(plt, [f[ci[2]]], [abs(v[ci[1],ci[2]]/norm(v[:,ci[2]]))], c = pal[4], alpha = 0.6, label = false, ms = 6, msw = 0.)    
+            else
+                scatter!(plt, f, v[j,:], c = pal[j], alpha = 0.35, label = false, ms = 3, msw = 0.)
+            end
+        end
+
+    end
+    return plt
+end
+
 
 
 

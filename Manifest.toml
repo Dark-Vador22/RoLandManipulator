@@ -2,7 +2,7 @@
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "4038fb3599bac89a4bb49c861023ca03501bfabb"
+project_hash = "b521246cbebc01d743118b0537c88967f265cc27"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1362,6 +1362,12 @@ version = "0.5.5"
 git-tree-sha1 = "cd1659ba0d57b71a464a29e64dbc67cfe83d54e7"
 uuid = "76eceee3-57b5-4d4a-8e66-0e911cebbf60"
 version = "1.6.1"
+
+[[deps.XML]]
+deps = ["Mmap", "OrderedCollections"]
+git-tree-sha1 = "a08437e8fc5729a47258bc8f6d846d167516bf69"
+uuid = "72c71f33-b9b6-44de-8c94-c961784809e2"
+version = "0.3.1"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Zlib_jll"]
