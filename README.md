@@ -37,15 +37,16 @@ update_visualization!(manipulator)
 θn = inverse_kinematics(man, C, sol = 2)
 ```
 
-### Trajectory creation
-Trajectories can be created with the functions below. For this purpose, another variable containing all hyperparameters is created
+### Trajectory generation
+Trajectories can be created with the functions below. The optimization is performed in the _joint space_, which implies the actuation torques are obtained through a mapping. Optionally the optimization can be carried out directly in the _actuation space_. Both options are explained below.
 ```jl
 # initial and final configuration
 x0 = [0.17; -1.22; -0.7; 0; zeros(4)]
 xf = [3.12; 1.22; 1.57; 0; zeros(4)]
 
-# hyperparameters for optimization
-op = OptimizationParameters(x0, xf, 0.001, 1.5, diagm([10*ones(4); 0.01*ones(4)]), 15.0diagm(ones(4)), diagm([30000*ones(4);ones(4)]), 1e-8);
+# Setting weighting matrices for the optimization in the joint space. Hyperparameters are set to comman values but can be accessed through keyword arguments (see docs). 
+# The optimzation with these weights has been tested and leads to a reasonable trajectory where the goal state is reached.  
+op = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([10*ones(4);0.01*ones(4)]), diagm([1;1;2.5;1000]), diagm([20*1e6*ones(4);1e6*ones(4)]), 1e-8); 
 
 X, U = iLQR(manipulator, op);
 
