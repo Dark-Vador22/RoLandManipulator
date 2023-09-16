@@ -64,7 +64,7 @@ plot_torques(op_joint.times[begin:stp:end], U_joint[begin:stp:end], ζ[begin:stp
 # animating the trajectory (may take some time in the first run)
 animate_manipulator!(manipulator, op_joint.times, X_joint)
 ```
-To do an actuation space optimization, set keyword **aspo** has to be set true in the optimization parameters. To compare resulting joint and actuation torques again the torques are mapped between the two spaces.  
+To do an actuation space optimization, the keyword **aspo** is set true in the optimization parameters. To compare resulting joint and actuation torques again the torques are mapped between the two spaces.  
 ```jl
 # Setting weigths and hyperparameters
 op_act = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([ones(4);0.1ones(4)]), 10diagm([1;1;1;1]), diagm(1e7ones(8)), 1e-8, aspo=true); 
