@@ -38,7 +38,8 @@ update_visualization!(manipulator)
 ```
 
 ### Trajectory generation
-Trajectories can be created with the functions below. The optimization is performed in the _joint space_, which implies the actuation torques are obtained through a mapping. Optionally the optimization can be carried out directly in the _actuation space_. Both options are explained below.
+The optimization is performed in the _joint space_, which implies the actuation torques are obtained through a mapping. Optionally the optimization can be carried out directly in the _actuation space_. 
+Both options are explained below. 
 ```jl
 # initial and final configuration
 x0 = [0.17; -1.22; -0.7; 0; zeros(4)]
@@ -46,12 +47,19 @@ xf = [3.12; 1.22; 1.57; 0; zeros(4)]
 
 # Setting weighting matrices for the optimization in the joint space. Hyperparameters are set to comman values but can be accessed through keyword arguments (see docs). 
 # The optimzation with these weights has been tested and leads to a reasonable trajectory where the goal state is reached.  
-op = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([10*ones(4);0.01*ones(4)]), diagm([1;1;2.5;1000]), diagm([20*1e6*ones(4);1e6*ones(4)]), 1e-8); 
+op_joint = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([10*ones(4);0.01*ones(4)]), diagm([1;1;2.5;1000]), diagm([20*1e6*ones(4);1e6*ones(4)]), 1e-8); 
 
-X, U = iLQR(manipulator, op);
+X_joint, U_joint = iLQR(manipulator, op_joint);
 
-plot_states(op.times, X) 
-plot_torques(op.times, U)
+# mapping torques into actuation space
+ζ = Vector{Vector{Float64}}(fill(zeros(manipulator.m), op_joint.N-1))
+for i = 1:op_joint.N-1
+    ζ[i] = manipulator.S[2:end,2:end]'*U_joint[i]
+end 
+
+stp = 100   # specify a step length to omit noise 
+plot_states(op_joint.times[begin:stp:end], X_joint[begin:stp:end]) 
+plot_torques(op_joint.times[begin:stp:end], U_joint[begin:stp:end], ζ[begin:stp:end]) 
 
 # animating the trajectory (may take some time in the first run)
 xs = [X[i][1:4] for i=1:op.N]; 
