@@ -57,19 +57,19 @@ for i = 1:op_joint.N-1
     ζ[i] = manipulator.S_'*U_joint[i]
 end 
 
-stp = 100   # specify a step length to omit noise 
+stp = 100   # specify a step length to smoothen curves
 plot_states(op_joint.times[begin:stp:end], X_joint[begin:stp:end]) 
 plot_torques(op_joint.times[begin:stp:end], U_joint[begin:stp:end], ζ[begin:stp:end]) 
 
 # animating the trajectory (may take some time in the first run)
 animate_manipulator!(manipulator, op_joint.times, X_joint)
 ```
-To do an actuation space optimization, the keyword **aspo** is set true in the optimization parameters. To compare resulting joint and actuation torques again the torques are mapped between the two spaces.  
+Creating a trajectory in actuation space, the keyword **aspo** is set true in the `OptimizationParameters` variable. To compare resulting joint and actuation torques again the torques are mapped between the two spaces.  
 ```jl
 # Setting weigths and hyperparameters
 op_act = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([ones(4);0.1ones(4)]), 10diagm([1;1;1;1]), diagm(1e7ones(8)), 1e-8, aspo=true); 
 
-X_act, U_act = iLQR(manipulator, op_act)     
+X_act, U_act = iLQR(manipulator, op_act);
 
 # mapping into joint space 
 τ = Vector{Vector{Float64}}(fill(zeros(op_act.m), op_act.N-1))
@@ -84,12 +84,15 @@ animate_manipulator!(manipulator, op_act.times, X_act)
 ```
 Alternatively, a simple trajectory can be created as well
 ```jl
+# making time steps bigger for that case
+op = OptimizationParameters(x0, xf, 0.01, 0.8, diagm([ones(4);0.1ones(4)]), 10diagm([1;1;1;1]), diagm(1e7ones(8)), 1e-8, aspo=true);
+
 X, U = naive_trajectory(manipulator, op);
 
-plot_states(op_joint.times, X) 
-plot_torques(op_joint.times, U)
+plot_states(op.times, X) 
+plot_torques(op.times, U)
 
-animate_manipulator!(manipulator, op_joint.times, X)
+animate_manipulator!(manipulator, op.times, X)
 ```
 
 ### Eigenmodes
