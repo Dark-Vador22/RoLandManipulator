@@ -34,7 +34,7 @@ Forward and inverse kinematics can be computed, where the elbow joint possesses 
 θ = 1 .- 2rand(5,)
 C = forward_kinematics!(manipulator, θ)
 update_visualization!(manipulator)
-θn = inverse_kinematics(man, C, sol = 2)
+θn = inverse_kinematics(manipulator, C, sol = 2)
 ```
 
 ### Trajectory generation
@@ -54,7 +54,7 @@ X_joint, U_joint = iLQR(manipulator, op_joint);
 # mapping torques into actuation space
 ζ = Vector{Vector{Float64}}(fill(zeros(manipulator.m), op_joint.N-1))
 for i = 1:op_joint.N-1
-    ζ[i] = manipulator.S[2:end,2:end]'*U_joint[i]
+    ζ[i] = manipulator.S_'*U_joint[i]
 end 
 
 stp = 100   # specify a step length to omit noise 
@@ -62,21 +62,17 @@ plot_states(op_joint.times[begin:stp:end], X_joint[begin:stp:end])
 plot_torques(op_joint.times[begin:stp:end], U_joint[begin:stp:end], ζ[begin:stp:end]) 
 
 # animating the trajectory (may take some time in the first run)
-xs = [X[i][1:4] for i=1:op.N]; 
-animation = MeshCat.Animation(old_man.mvis, op.times, xs);
-setanimation!(old_man.mvis, animation);
+animate_manipulator!(manipulator, op_joint.times, X_joint)
 ```
 
 Alternatively, a simple trajectory can be created as well
 ```jl
 X, U = naive_trajectory(manipulator, op);
 
-plot_states(op.times, X) 
-plot_torques(op.times, U)
+plot_states(op_joint.times, X) 
+plot_torques(op_joint.times, U)
 
-xs = [X[i][1:4] for i=1:op.N]; 
-animation = MeshCat.Animation(old_man.mvis, op.times, xs);
-setanimation!(old_man.mvis, animation);
+animate_manipulator!(manipulator, op_joint.times, X)
 ```
 
 ### Eigenmodes

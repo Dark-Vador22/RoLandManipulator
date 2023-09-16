@@ -246,7 +246,7 @@ function iLQR(X::AbstractArray, U::AbstractArray, man::Manipulator, op::Optimiza
         X, U, J, fpf = forward_pass(X, U, J, K, d, ΔVu, ΔVuu, man, op, bpf=bpf,verbose=verbose)
         K, d, ΔVu, ΔVuu, bpf = backward_pass(X, U, man, op, fpf=fpf,verbose=verbose);
         c += 1
-        println("interation: $c")
+        println("iteration: $c")
         if c >= op.i_max
             break
         end

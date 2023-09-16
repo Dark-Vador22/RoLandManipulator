@@ -1,6 +1,8 @@
 module RoLandManipulator
 
 using LinearAlgebra
+export diagm
+
 using ForwardDiff
 using StaticArrays
 
@@ -49,7 +51,7 @@ include("./trajectory_optimization.jl")
 export dynamics, naive_trajectory, iLQR
 
 include("./visualization.jl")
-export plot_frame, plot_frame!, update_visualization!, plot_torques, plot_states, show_frequencies
+export plot_frame, plot_frame!, update_visualization!, animate_manipulator!, plot_torques, plot_states, show_frequencies
 
 # creates two manipulator types from stored data
 include("./config.jl")

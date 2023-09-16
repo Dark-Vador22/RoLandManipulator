@@ -6,20 +6,30 @@ function update_visualization!(man::Manipulator)
 end
 
 """
+MeshCat animation of the manipulator
+"""
+function animate_manipulator!(man::Manipulator, times::AbstractArray, Xs::AbstractArray)
+    # only taking positions from state array
+    xs = [Xs[i][1:4] for i = 1:length(times)]
+    animation = MeshCat.Animation(man.mvis, times, xs);
+    setanimation!(man.mvis, animation);
+end
+
+"""
 Shows torques from collected control array 
 """
-function plot_torques(times::AbstractVector, τ::AbstractVector; cscheme=:Dark2_5, joints=[1,2,3,4])
+function plot_torques(times::AbstractVector, τ::AbstractVector; cscheme=:Dark2_5)
     plt = plot(xlabel = "time [s]", ylabel = "torque [Nm]")
-    for i in joints
+    for i = 1:4
         plot!(plt, times[1:end-1], [τ[j][i] for j = 1:length(τ)], lw = 3, ls = :dash, alpha = 0.6, label = "joint $i", color=palette(cscheme)[i], size=(800,300),
         bottom_margin=5mm, left_margin=5mm,xtickfontsize=10,ytickfontsize=10,dpi=500)
     end
     return plt
 end 
 
-function plot_torques(times::AbstractVector, τ::AbstractVector, ζ::AbstractVector; cscheme=:Dark2_5, joints=[1,2,3,4])
-    plt = plot_torques(times, τ, cscheme=cscheme, joints=joints)
-    for i in joints
+function plot_torques(times::AbstractVector, τ::AbstractVector, ζ::AbstractVector; cscheme=:Dark2_8)
+    plt = plot_torques(times, τ, cscheme=cscheme)
+    for i = 1:4
         plot!(plt, times[1:end-1], [ζ[j][i] for j = 1:length(ζ)], lw = 3, label = "actuator $i", color=palette(cscheme)[i+4])
     end
     return plt
