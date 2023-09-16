@@ -47,7 +47,7 @@ xf = [3.12; 1.22; 1.57; 0; zeros(4)]
 
 # Setting weighting matrices for the optimization in the joint space. Hyperparameters are set to comman values but can be accessed through keyword arguments (see docs). 
 # The optimzation with these weights has been tested and leads to a reasonable trajectory where the goal state is reached.  
-op_joint = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([10*ones(4);0.01*ones(4)]), diagm([1;1;2.5;1000]), diagm([20*1e6*ones(4);1e6*ones(4)]), 1e-8); 
+op_joint = OptimizationParameters(x0, xf, 0.0001, 0.8, Q = diagm([10*ones(4);0.01*ones(4)]), R = diagm([1;1;2.5;1000]), Qf = diagm([20*1e6*ones(4);1e6*ones(4)]), 1e-8); 
 
 X_joint, U_joint = iLQR(manipulator, op_joint);
 
@@ -67,7 +67,7 @@ animate_manipulator!(manipulator, op_joint.times, X_joint)
 Creating a trajectory in actuation space, the keyword **aspo** is set true in the `OptimizationParameters` variable. To compare resulting joint and actuation torques again the torques are mapped between the two spaces.  
 ```jl
 # Setting weigths and hyperparameters
-op_act = OptimizationParameters(x0, xf, 0.0001, 0.8, diagm([ones(4);0.1ones(4)]), 10diagm([1;1;1;1]), diagm(1e7ones(8)), 1e-8, aspo=true); 
+op_act = OptimizationParameters(x0, xf, 0.0001, 0.8, Q = diagm([ones(4);0.1ones(4)]), R = 10diagm([1;1;1;1]), Qf = diagm(1e7ones(8)), 1e-8, aspo=true); 
 
 X_act, U_act = iLQR(manipulator, op_act);
 
@@ -85,7 +85,7 @@ animate_manipulator!(manipulator, op_act.times, X_act)
 Alternatively, a simple trajectory can be created as well
 ```jl
 # making time steps bigger for that case
-op = OptimizationParameters(x0, xf, 0.01, 0.8, diagm([ones(4);0.1ones(4)]), 10diagm([1;1;1;1]), diagm(1e7ones(8)), 1e-8, aspo=true);
+op = OptimizationParameters(x0, xf, 0.01, 0.8, Q = diagm([ones(4);0.1ones(4)]), R = 10diagm([1;1;1;1]), Qf = diagm(1e7ones(8)), 1e-8, aspo=true);
 
 X, U = naive_trajectory(manipulator, op);
 
@@ -96,7 +96,7 @@ animate_manipulator!(manipulator, op.times, X)
 ```
 
 ### Eigenmodes
-A plot of the frequency modes for 500 random poses can be created
+A plot of the frequency modes for 500 random poses is created with
 ```jl
 julia> plt = show_frequencies(manipulator, 500)
 ```

@@ -31,7 +31,7 @@ mutable struct OptimizationParameters
     """
     Standard constructor with predefined final time and step-size
     """
-    function OptimizationParameters(x0::Vector, xf::Vector, h::Float64, tf::Float64, Q::Matrix, R::Union{Matrix, Real}, Qf::Matrix, tol::Float64; aspo=false, i_max = 50, β=0, Φ_β=2, β_max=1e8, r_max=50, J_max=1e8, lb=1e-2, ub=10, l_max=5)
+    function OptimizationParameters(x0::Vector, xf::Vector, h::Float64, tf::Float64; Q::Matrix, R::Union{Matrix, Real}, Qf::Matrix, tol::Float64, aspo=false, i_max = 50, β=0, Φ_β=2, β_max=1e8, r_max=50, J_max=1e8, lb=1e-2, ub=10, l_max=5)
         if size(Qf) != size(Q)
             throw(error("Final and intermediate cost matrix dimensions do not match. Qf ∈ ℝ^{$(size(Qf)[1]) × $(size(Qf)[2])} but Q ∈ ℝ^{$(size(Q)[1]) × $(size(Q)[2])}"))
         end 
@@ -46,7 +46,7 @@ mutable struct OptimizationParameters
         new(x0, xf, tf, times, N, n, m, aspo, Q, R, Qf, tol, i_max, β, Φ_β, β_max, r_max, J_max, lb, ub, l_max)
     end
 
-    function OptimizationParameters(x0::Vector, xf::Vector, times::AbstractArray, Q::Matrix, R::Union{Matrix, Real}, Qf::Matrix, tol::Float64; aspo=false, i_max = 50, β=0, Φ_β=2, β_max=1e8, r_max=50, J_max=1e8, lb=1e-2, ub=10, l_max=5)
+    function OptimizationParameters(x0::Vector, xf::Vector, times::AbstractArray; Q::Matrix, R::Union{Matrix, Real}, Qf::Matrix, tol::Float64, aspo=false, i_max = 50, β=0, Φ_β=2, β_max=1e8, r_max=50, J_max=1e8, lb=1e-2, ub=10, l_max=5)
         if size(Qf) != size(Q)
             throw(error("Final and intermediate cost matrix dimensions do not match. Qf ∈ ℝ^{$(size(Qf)[1]) × $(size(Qf)[2])} but Q ∈ ℝ^{$(size(Q)[1]) × $(size(Q)[2])}"))
         end 
