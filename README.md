@@ -9,9 +9,8 @@ C. Stoeffler, J. Janzen, A. del Rio and H. Peters, Design Analysis of a Novel Be
 * Visit https://julialang.org and download the appropriate version
 * Use of `const` inside `mutable struct` requires at least julia version 1.8 here!
 * A symlink can be created in `.bashrc` with `export PATH="$PATH:/path/to/<Julia directory>/bin"`
-* Download the repo
-* Start julia and open the package manager with `]` and run `dev --local RELATIVE_PATH_TO/RoLandManipulator`
-
+* Download the repo, e.g. via `git clone https://github.com/Dark-Vador22/RoLandManipulator`
+* Start julia, open the package manager with `]` (shell promt changes) and run `dev --local RELATIVE_PATH_TO/RoLandManipulator`. The package is now locally available.
 ## Using the package
 The package can now be loaded in a Julia session and a variable of type `Manipulator` can be created by calling a function from a config file.
 ```jl
@@ -47,7 +46,7 @@ xf = [3.12; 1.22; 1.57; 0; zeros(4)]
 
 # Setting weighting matrices for the optimization in the joint space. Hyperparameters are set to comman values but can be accessed through keyword arguments (see docs). 
 # The optimzation with these weights has been tested and leads to a reasonable trajectory where the goal state is reached.  
-op_joint = OptimizationParameters(x0, xf, 0.0001, 0.8, Q = diagm([10*ones(4);0.01*ones(4)]), R = diagm([1;1;2.5;1000]), Qf = diagm([20*1e6*ones(4);1e6*ones(4)]), 1e-8); 
+op_joint = OptimizationParameters(x0, xf, 0.001, 0.8, Q = diagm([10*ones(4); 0.01*ones(4)]), R = 1.0diagm([ones(2);1;1000]), Qf = diagm([550000*ones(4);ones(4)]), 1e-8, r_max=60, β_max=1e8, i_max=50);
 
 X_joint, U_joint = iLQR(manipulator, op_joint);
 
@@ -67,7 +66,7 @@ animate_manipulator!(manipulator, op_joint.times, X_joint)
 Creating a trajectory in actuation space, the keyword **aspo** is set true in the `OptimizationParameters` variable. To compare resulting joint and actuation torques again the torques are mapped between the two spaces.  
 ```jl
 # Setting weigths and hyperparameters
-op_act = OptimizationParameters(x0, xf, 0.0001, 0.8, Q = diagm([ones(4);0.1ones(4)]), R = 10diagm([1;1;1;1]), Qf = diagm(1e7ones(8)), 1e-8, aspo=true); 
+op_act = OptimizationParameters(x0, xf, 0.001, 0.8, Q = diagm([10*ones(4); 0.01*ones(4)]), R = 1.0diagm([ones(2);1;1000]), Qf = diagm([550000*ones(4);ones(4)]), 1e-8, r_max=60, β_max=1e8, i_max=50, aspo = true); 
 
 X_act, U_act = iLQR(manipulator, op_act);
 
