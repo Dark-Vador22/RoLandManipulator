@@ -8,9 +8,13 @@ C. Stoeffler, J. Janzen, A. del Rio and H. Peters, Design Analysis of a Novel Be
 
 * Visit https://julialang.org and download the appropriate version
 * Use of `const` inside `mutable struct` requires at least julia version 1.8 here!
-* A symlink can be created in `.bashrc` with `export PATH="$PATH:/path/to/<Julia directory>/bin"`
-* Download the repo, e.g. via `git clone https://github.com/Dark-Vador22/RoLandManipulator`
-* Start julia, open the package manager with `]` (shell promt changes) and run `dev --local RELATIVE_PATH_TO/RoLandManipulator`. The package is now locally available.
+* For Linux-based systems a symlink can be created in `.bashrc` with `export PATH="$PATH:/path/to/<Julia directory>/bin"`
+* Start julia
+* The repo can be directly added by `Pkg.add(RoLandManipulator)` or opening the package manager with `]` (shell promt changes) and `add RoLandManipulator`.
+* Alternatively: 
+    * Download the repo, e.g. via `git clone https://github.com/Dark-Vador22/RoLandManipulator`
+    * Open the package manager with `]` (shell promt changes) and run `dev --local RELATIVE_PATH_TO/RoLandManipulator`. The package is now locally available.
+      
 ## Using the package
 The package can now be loaded in a Julia session and a variable of type `Manipulator` can be created by calling a function from a config file.
 ```jl
