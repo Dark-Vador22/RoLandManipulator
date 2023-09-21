@@ -16,7 +16,7 @@ The package can now be loaded in a Julia session and a variable of type `Manipul
 ```jl
 julia> using RoLandManipulator
 
-julia> manipulator = build_old_manipulator()
+julia> manipulator = build_manipulator()
 ```
 
 This creates a MeshCat server for the visualization of the manipulator in its initial configuration

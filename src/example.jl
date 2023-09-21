@@ -3,7 +3,7 @@ x0 = [0.17; -1.22; -0.7; 0; zeros(4)]
 xf = [3.12; 1.22; 1.57; 0; zeros(4)]
 
 # building old and new manipulator structure (needed for all robotsS)
-old_man = build_old_manipulator(); 
+old_man = build_manipulator(); 
 
 ######## RoLand manipulator
 # these work !!

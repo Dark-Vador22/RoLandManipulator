@@ -55,6 +55,6 @@ export plot_frame, plot_frame!, update_visualization!, animate_manipulator!, plo
 
 # creates two manipulator types from stored data
 include("./config.jl")
-export build_old_manipulator, build_new_manipulator
+export build_manipulator
    
 end # module
