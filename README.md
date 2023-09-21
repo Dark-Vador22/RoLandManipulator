@@ -12,7 +12,7 @@ C. Stoeffler, J. Janzen, A. del Rio and H. Peters, Design Analysis of a Novel Be
 * Start julia
 * The repo can be directly added by `Pkg.add(RoLandManipulator)` or opening the package manager with `]` (shell promt changes) and `add RoLandManipulator`.
 * Alternatively: 
-    * Download the repo, e.g. via `git clone https://github.com/Dark-Vador22/RoLandManipulator`
+    * Download the repo, e.g. via `git clone git@github.com:Dark-Vador22/RoLandManipulator` (ssh key required)
     * Open the package manager with `]` (shell promt changes) and run `dev --local RELATIVE_PATH_TO/RoLandManipulator`. The package is now locally available.
       
 ## Using the package
