@@ -29,7 +29,7 @@ This creates a MeshCat server for the visualization of the manipulator in its in
 ┌ Info: MeshCat server started. You can open the visualizer by visiting the following URL in your browser:
 └ http://127.0.0.1:8700
 
-julia> # MORE DOC HERE!
+julia> 
 ```
 ### Simple kinematics
 Forward and inverse kinematics can be computed, where the elbow joint possesses two inverse solutions. Note that the functions `forward_kinematics!` and `inverse_kinematics!` alter the variable of type `Manipulator`:
@@ -153,12 +153,4 @@ with the following gear ratios $`g_i`$ related to schemactics and graph:
         \end{matrix}
 ```
 where the gear ratio computes from the wheel belt radi s.t. $N_j^i = r_j/r_i$ and $1/N_j^i = N_i^j$. 
-
-## Belt kinematics of the new design
-
-![test](./images/arm_schematics_new.png?raw=true "Schematics of the arm for the last 4 DOFs in planar depiction")
-
-From this, one can obtain the connected graph that represents the system of linear equations
-
-![test](./images/graph_new.png?raw=true "Unerlying graph of the manipulator")
 
