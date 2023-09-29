@@ -11,12 +11,12 @@ for link in get_elements_by_tagname(xroot, "link")
     set_attribute(mesh, "filename", new_value)
 end
 # save file as copy in package
-if Sys.islinux()
+if Sys.islinux() || Sys.isapple()
     save_file(xdoc, joinpath(@__DIR__, "..", "urdf/local_copy.urdf"))
 elseif Sys.iswindows()
     save_file(xdoc, joinpath(@__DIR__, "..", "urdf\\local_copy.urdf"))
 else
-    @warn "OS not recogniesed - visualization will not work"
+    @warn "Can't write local URDF copy - visualisation will not work"
 end
 
 """
