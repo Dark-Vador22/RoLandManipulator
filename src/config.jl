@@ -11,8 +11,13 @@ for link in get_elements_by_tagname(xroot, "link")
     set_attribute(mesh, "filename", new_value)
 end
 # save file as copy in package
-save_file(xdoc, joinpath(@__DIR__, "..", "urdf/local_copy.urdf"))
-
+if Sys.islinux()
+    save_file(xdoc, joinpath(@__DIR__, "..", "urdf/local_copy.urdf"))
+elseif Sys.iswindows()
+    save_file(xdoc, joinpath(@__DIR__, "..", "urdf\\local_copy.urdf"))
+else
+    @warn "OS not recogniesed - visualization will not work"
+end
 
 """
 Definition of joints and links by Lie group representation
