@@ -77,7 +77,7 @@ X_act, U_act = iLQR(manipulator, op_act);
 # mapping into joint space 
 τ = Vector{Vector{Float64}}(fill(zeros(op_act.m), op_act.N-1))
 for i = 1:op_act.N-1
-    τ[i] = manipulator.S[2:end,2:end]'\U_act[i]
+    τ[i] = manipulator.S'\U_act[i]
 end 
 # plot state and torque trajectory
 plot_states(op_act.times[begin:stp:end], X_act[begin:stp:end]) 
