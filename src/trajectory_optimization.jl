@@ -28,7 +28,6 @@ function naive_trajectory(man::Manipulator, op::OptimizationParameters; sim_forw
             vel = t*a
             current_state = MechanismState(man.rbd_model, pos, vel)
             if op.aspo
-                # TODO: decide whether to also map the initial trajectory or not
                 τ[i] = man.S_'*inverse_dynamics(current_state, fake_state.v)
             else 
                 τ[i] = inverse_dynamics(current_state, fake_state.v)
@@ -39,8 +38,7 @@ function naive_trajectory(man::Manipulator, op::OptimizationParameters; sim_forw
             vel = a*(op.tf-t)
             current_state = MechanismState(man.rbd_model, pos, vel) 
             if op.aspo
-                # TODO: decide whether to also map the initial trajectory or not
-                τ[i] = man.S_\inverse_dynamics(current_state, fake_state_.v)
+                τ[i] = man.S_'*inverse_dynamics(current_state, fake_state_.v)
             else 
                 τ[i] = inverse_dynamics(current_state, fake_state_.v)
             end 
